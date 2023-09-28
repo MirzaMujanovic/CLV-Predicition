@@ -397,12 +397,10 @@ By understanding the long-term worth of a customer, organizations can make more 
 
 In essence, a robust prediction of CLV acts as a compass, guiding businesses in making decisions that are not just focused on immediate gains, but on long-term profitability and growth. Embracing such analytical approaches can pave the way for sustained business growth and customer satisfaction.
 
-This revised section should integrate your provided content smoothly into the existing information about the applications of CLV predictions.
-
 ### Sources
 
 1.  Fader, Pete & Hardie, Bruce. (2007). [HOW TO PROJECT CUSTOMER RETENTION](https://faculty.wharton.upenn.edu/wp-content/uploads/2012/04/Fader_hardie_jim_07.pdf). Journal of Interactive Marketing.
 
 2.  Bryl', Serhii. (2018). [LTV prediction for a recurring subscription with R](https://www.analyzecore.com/2018/09/19/ltv-prediction-for-a-recurring-subscription-with-r/). AnalyzeCore.
 
-#### **For more projects and information about me, check out [my website.](https://mirzamujanovic.github.io/website/)** 
+#### **For more projects and information about me, check out [my website.](https://mirzamujanovic.github.io/website/)**
