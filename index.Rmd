@@ -1,204 +1,382 @@
 ---
-title: "Weekly Meal Planner - User Guide and Benefits"
+title: "The magic of CLV"
 output:
   html_document:
     css: styles.css
 ---
+### TLDR;
 
-### **🍽️ Intro**
-The Weekly Meal Planner by A.M. is a powerful tool designed to help you effortlessly create a weekly meal schedule. Whether you're planning meals for yourself, your family, or an event, this tool streamlines the process and ensures that your meals are diverse and tailored to your preferences. Below, we'll guide you through how to use this tool and highlight its benefits.
+In this article, we delve deep into the concept of Customer Lifetime Value (CLV) and how it can be precisely estimated using beta-geometric (BG) distribution to predict a customer's lifetime value with more accuracy. We also illustrate the application using a real example with R programming, showcasing the utility of the BG model in a subscription business setting.
 
-#### **🛠️ Set Up the Environment**
-   - Ensure you have R & RStudio installed on your computer
-   - Save the R Notebook provided as "index.Rmd."
-   - Install and load the necessary R packages: `tidyr`, `tidyverse`, and `googlesheets4`. You can do this using the `install.packages()` and `library()` functions in R.
+### Customer Lifetime Value (CLV or LTV)
 
-#### **🌐 Authenticate with Google Sheets**
-   - The tool utilizes Google Sheets as a data source. To access your Google Sheets, you'll need to authenticate your Google account with R. Use the `gs4_auth()` function, replacing `"YOUR_EMAIL@gmail.com"` with your Gmail address. This step grants the tool access to your Google Sheets.
+Customer Lifetime Value (CLV or LTV) is a metric that represents the total net profit a company can expect to earn from a single customer throughout their time as a customer. It is an important metric as it helps businesses understand how much value different customers bring over their lifetime and can guide resource allocation, marketing strategies, and pricing policies. Here are some basic elements often used to calculate LTV
 
-#### **🍲 Prepare Your Meals in Google Sheets:**
-   - Create a Google Sheet (or use an existing one) to list your favorite meals. You can access this sheet using this [link](https://docs.google.com/spreadsheets/d/13uEbDKVbkLz9PpYwXzOLZAgw_ZWppBm7pjnDbHnH9yA/edit#gid=0), and make a copy for yourself.
-   - In the Google Sheet, include columns for "Meal_Name," "Type," "Prep_Time_min," "Recipe_Link," and "Effort." Fill in the details for each meal.
++--------------------------------------+---------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Metric                               | Description                                                                                       | Formula                                                                                                                                                                                                            |
++:====================================:+:=================================================================================================:+:==================================================================================================================================================================================================================:+
+| **Average Purchase Value (APV)**     | It is calculated as the total revenue divided by the number of purchases during a specific period | $$                                                                                                                                                                                                                 |
+|                                      |                                                                                                   |                                                                                                                                                     \frac{\text{Total Revenue}}{\text{Number of Purchases}}        |
+|                                      |                                                                                                   |                                                                                                                                                                               $$                                   |
++--------------------------------------+---------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Average Purchase Frequency (APF)** | This is the average number of purchases made by a customer during a specific period               | $$                                                                                                                                                                                                                 |
+|                                      |                                                                                                   |                                                                                                                                               \frac{\text{Number of Purchases}}{\text{Number of Unique Customers}} |
+|                                      |                                                                                                   |                                                                                                                                                                               $$                                   |
++--------------------------------------+---------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Customer Value (CV)**              | This is calculated as the average purchase value multiplied by the average purchase frequency     | $$                                                                                                                                                                                                                 |
+|                                      |                                                                                                   |                                                                                                                                                                   \text{APV} \times \text{APF}                     |
+|                                      |                                                                                                   |                                                                                                                                                                               $$                                   |
++--------------------------------------+---------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| **Average Customer Lifespan (ACL)**  | This is the average number of periods a customer continues to buy from the company                | $$                                                                                                                                                                                                                 |
+|                                      |                                                                                                   |                                                                                                                                               \frac{\text{Sum of Customer Lifespans}}{\text{Number of Customers}}  |
+|                                      |                                                                                                   |                                                                                                                                                                               $$                                   |
++--------------------------------------+---------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-#### **💾 Export Google Sheet as CSV (Optional):**
-   - You can export your Google Sheet as a CSV file if needed. However, this step is optional, as the tool can directly access Google Sheets.
+Combining these elements, we can define the **Customer Lifetime Value** using the following formula:
 
-#### **📊 Access Google Sheet Data:**
-   - In the R Notebook, specify the URL of your Google Sheet using the `sheet_url` variable. Replace `"YOUR_GOOGLE_SHEET_URL"` with the actual URL of your Google Sheet.
-   - Use the `googlesheets4::read_sheet()` function to load your Google Sheet data into R. The tool will automatically convert the data into a data frame for further processing.
+$$
+\text{CLV} = \text{CV} \times \text{ACL}
+$$
 
-#### **📅 Generate Your Meal Schedule:**
-   - The tool generates a weekly meal schedule with three meals a day (breakfast, lunch, and dinner) for each day of the week (Monday to Sunday).
-   - It ensures that meals are randomized and don't repeat within the same week.
-   - The output provides details such as the meal name, preparation time, recipe link, and effort level.
+Alternatively, we can utilize several crucial business metrics to ascertain the lifetime value of a customer.
 
-### **🏆 Benefits**
+$$CLV = (ARPU \times \text{Gross Margin}) / \text{Churn Rate}$$
 
-**⏱️ Time-Saving.** This tool significantly reduces the time and effort required to create a weekly meal plan. Instead of manually organizing meals, the tool does it in seconds.
++------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| Metric                       | Description                                                                                                                                              | Formula                                                                                                       |
++:============================:+:========================================================================================================================================================:+:=============================================================================================================:+
+| **Average Revenue per User** | This metric provides an understanding of the revenue generated per user or customer                                                                      | $$\frac{\text{Total Revenue}}{\text{Number of Users (or Customers)}}$$                                        |
++------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| **Gross Margin**             | Representing the profitability, it is the proportion of revenue retained as profit after accounting for the direct costs of producing goods and services | $$\frac{\text{Total Revenue - Cost of Goods Sold}}{\text{Total Revenue}}$$                                    |
++------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+
+| **Churn Rate**               | It indicates the percentage of customers that stopped using a company's product or service during a certain timeframe                                    | $$\frac{\text{Number of Customers Lost in a Period}}{\text{Number of Customers at the Start of the Period}}$$ |
++------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------+
 
-**🍽️ Diverse Meals.** By randomizing your meals, it helps ensure that you enjoy a variety of dishes throughout the week, preventing meal monotony.
+By incorporating ARPU and Gross Margin, we essentially derive a metric representing the net revenue per user, which is then divided by the churn rate to get a value representing the lifetime value of a customer.
 
-**🔧 Customization.** You have full control over your meal choices. You can easily update your Google Sheet with new recipes or preferred meals, and the tool will adapt accordingly.
+## Challenges
 
-**🚀 Efficiency.** The tool is designed to be efficient and user-friendly. With just a few simple steps, you can generate a detailed meal plan tailored to your preferences.
+Predicting CLV is not a straightforward task. The churn rates are not constant; they can vary significantly over time due to a multitude of factors, including changes in customer behavior and preferences. Similarly, user churns are not consistent; some might leave early in their customer journey, while others stick around for a longer period. Moreover, the offerings and revenue generation is seldom constant, undergoing changes due to business strategies, market dynamics, and customer demands.
 
-**🌍 Access Anywhere.** Since your meal data is stored in a Google Sheet, you can access and edit it from anywhere, making meal planning a breeze even when you're on the go.
+## Shifted-Beta-Geometric Model
 
----
-
-# Weekly Meal Planner
-
-```{r,warning=FALSE,message=FALSE,echo=FALSE}
-library(tidyr)
-library(tidyverse)
-library(googlesheets4)
+```{r, echo=FALSE,warning=FALSE, error=FALSE,message=FALSE}
+library(ggplot2)
+library(plotly)
+library(reshape2)
+library(MLmetrics)
+library(dplyr)
 library(knitr)
 library(kableExtra)
-gs4_auth(email = "mirza.mujanovic@gmail.com")
 ```
 
-```{r,warning=FALSE,message=FALSE,echo=FALSE}
-# Manual import
-data <- read.csv("Meal Planner - Calendar Week 35.csv",header=TRUE)
-#or via Google Sheet package
-sheet_url <- "https://docs.google.com/spreadsheets/d/13uEbDKVbkLz9PpYwXzOLZAgw_ZWppBm7pjnDbHnH9yA/edit#gid=1859631947"
-#data<- suppressMessages(googlesheets4::read_sheet(sheet_url,sheet = 1)) # IMPORTANT: sheet = 1 means it takes first sheet tab.
-data$type <- tolower(data$type) #lower-case the type of the meal
+A hypothetical firm selected a user cohort, for instance, users of a specific subscription (e.g. monthly subscription) hailing from a specific country, to analyze their monthly subscription retention rates over the recent months and refine its Customer Lifetime Value (CLV) predictions based on recent monthly subscription retention rates. To enhance the precision of our CLV prediction, it is beneficial to formulate more detailed cohorts by incorporating additional attributes of subscribers that can potentially influence churn rates.
+
+The retention rates were recorded as follows:
+
++-------+-----------+
+| Month | Retention |
++:=====:+:=========:+
+| 0     | 100%      |
++-------+-----------+
+| 1     | 41%       |
++-------+-----------+
+| 2     | 24%       |
++-------+-----------+
+| 3     | 17%       |
++-------+-----------+
+| 4     | 12%       |
++-------+-----------+
+| 5     | 9%        |
++-------+-----------+
+| 6     | 6%        |
++-------+-----------+
+| 7     | 5%        |
++-------+-----------+
+
+```{r, echo=FALSE}
+# Monthly retention rate of a user cohort
+ret_data <- c(1.00000,0.412302, 0.241252, 0.170753, 0.124047, 0.093038, 0.066704,0.052063)
+```
+
+```{r, echo=FALSE}
+# Creating a data frame from retention data
+ret_data_df <-  data.frame(month_lt = c(0:7),ret_data) %>%
+        # Reshaping data from wide format to long format for better visualization
+        melt(., id.vars = c('month_lt'), value.name = 'retention_rate')%>%
+        select(-variable)
+
+# Creating a line plot to visualize the monthly retention rate
+(ret_data_df_plot<-ggplot(ret_data_df, aes(x=month_lt,y=retention_rate)) +
+        # Applying a minimal theme to the plot
+        theme_minimal() +
+        # Adding a line geom to connect the points with lines
+        geom_line(color="steelblue") +
+        # Adding a point geom to represent data points on the plot
+        geom_point(color="steelblue") +
+        # Adjusting the theme elements such as title, axis text, etc.
+        theme(plot.title = element_text(size = 20, face = 'bold', vjust = 2, hjust = 0.5),
+              axis.text.x = element_text(size = 8, hjust = 0.5, vjust = .5, face = 'plain'),
+              strip.text = element_text(face = 'bold', size = 9)) +
+        # Labeling the X-axis as 'Months'
+        xlab('Months')+
+        # Labeling the Y-axis as 'Retention rate'
+        ylab('Retention rate')+
+        # Adding a title and subtitle to the plot
+        ggtitle(label = '',subtitle = 'Decreasing subscription retention rate')+
+        # Setting X-axis breaks for better readability
+        scale_x_continuous(breaks = round(seq(min(ret_data_df$month_lt), max(ret_data_df$month_lt)))))
+```
+
+To accurately forecast customer retention and churn, we're utilizing the proven techniques of esteemed scholars Pete Fader and Bruce Hardie, incorporating their shifted-beta-geometric (sBG) model into our analytical toolbox.
+
+Therefore, we will define a few functions, including churnBG and survivalBG, that are built upon the concepts of beta-geometric distribution to calculate churn and survival probabilities, respectively. The MLL function defines the maximum likelihood estimation which helps in estimating the parameters α and β for our BG model.
+
+### Churn Rate
+
+```{r}
+# Define a function to calculate churn using the Shifted Beta Geometric (sBG) distribution
+churnBG <- Vectorize(function(alpha, beta, period) {
+        # Calculate the churn probability for the first period
+        t1 = alpha / (alpha + beta)
+        result = t1
+        # Recursively calculate the churn probability for later periods
+        if (period > 1) {
+                result = churnBG(alpha, beta, period - 1) * (beta + period - 2) / (alpha + beta + period - 1)
+        }
+        return(result)
+        # The vectorize.args parameter specifies which argument(s) to vectorize over
+}, vectorize.args = c("period"))
+```
+
+The **churnBG** function systematically refines the prediction of the current rate of customer churn by taking a close look at the history of customer behavior, step by step, back to the very beginning. This way, it considers the entire journey and not just recent trends, offering a richer, more detailed picture that can help foresee customer churn with higher precision. It's a smart approach, learning from the past to predict the future, enhancing the reliability of its predictions over time.
+
+### Survival Rate
+
+```{r}
+# Define a function to calculate survival using the sBG distribution
+survivalBG <- Vectorize(function(alpha, beta, period) {
+        # Calculate the survival probability for the first period
+        t1 = 1 - churnBG(alpha, beta, 1)
+        result = t1
+        # Recursively calculate the survival probability for later periods
+        if(period > 1){
+                result = survivalBG(alpha, beta, period - 1) - churnBG(alpha, beta, period)
+        }
+        return(result)
+        # The vectorize.args parameter specifies which argument(s) to vectorize over
+}, vectorize.args = c("period"))
+```
+
+The **survivalBG** function calculates the "survival probability," a metric that shows the likelihood of customers continuing their subscription over a certain period.
+
+Here's the process:
+
+1.  In the initial period, it identifies what portion of customers have stayed on.
+
+2.  For subsequent periods, it constantly refines this figure, updating it based on the most recent data to offer a current and informed view of customer retention.
+
+In essence, it builds a dynamic picture of customer retention, getting more precise with each period, helping us strategize more effectively for the future.
+
+### Maximum Log-Likelihood
+
+```{r}
+# Define a function to calculate the maximum log-likelihood
+MLL <- function(alphabeta) {
+        # Check that the activeCust and lostCust vectors are the same length
+        if(length(activeCust) != length(lostCust)) {
+                # Stop the function and print an error message if they are not
+                stop("Variables activeCust and lostCust have different lengths: ",
+                     length(activeCust), " and ", length(lostCust), ".")
+        }
+        # Define t as the number of periods
+        t = length(activeCust) 
+        # Define alpha and beta from the input vector alphabeta
+        alpha = alphabeta[1]
+        beta = alphabeta[2]
+        # Calculate the negative log-likelihood
+        return(-as.numeric(
+                # Sum of the log-likelihoods for each period, considering churned customers
+                sum(lostCust * log(churnBG(alpha, beta, 1:t))) +
+                # Log-likelihood for the last period, considering the active customers
+                activeCust[t]*log(survivalBG(alpha, beta, t))
+        ))
+}
+```
+
+The **MLL** function is a crucial tool in refining our understanding of customer retention patterns over time. Its mission is to find the optimal alpha and beta parameters that are most aligned with our existing data, based on a beta distribution.
+
+The function computes the Maximum Log-Likelihood, a statistic representing how well the chosen alpha and beta parameters explain the observed customer behavior in our dataset. It uses the churn and survival probabilities - derived from the beta distribution - in its calculations. The beta distribution here is a mathematical function used to model the random behavior of our customer base, with alpha and beta shaping its characteristics to mirror real-world scenarios accurately.
+
+### **Data Transformation**
+
+We transformed the data to have additional columns indicating active and lost customers.
+
+```{r,echo=FALSE}
+# Retention data frame
+# Using the mutate function to create new columns in the ret_data_df data frame
+ret_data_df <- ret_data_df %>%
+        # Creating a new column "activeCust" which is the product of a constant (14791) and the "retention_rate" column
+        mutate(activeCust = 10000 * retention_rate,
+               
+               # Creating a new column "lostCust" which is calculated as the difference 
+               # between the "activeCust" value of the previous row (lag) and the "activeCust" value of the current row
+               lostCust = lag(activeCust) - activeCust,
+               
+               # Replacing NA values in the "lostCust" column with 0 using the ifelse function
+               lostCust = ifelse(is.na(lostCust), 0, lostCust))
+
+kbl(ret_data_df) %>% kable_styling(bootstrap_options = c("striped"),row_label_position = c('c'))
+```
+
+### Retention Predicition
+
+Now we are using historical data to anticipate customer retention rates over a period of 7 months. After each month, we adjust our predictive parameters to better represent our historical trends, and employ a survival function methodology to forecast the customer retention for every subsequent month.
+
+```{r}
+# Initiating a list to store predictions for each month from 1 to 7
+ret_data_preds <- vector('list', 7)
+# Looping over each month from 1 to 7 to generate predictions for each month
+for (i in c(1:7)) {
+        # Filtering the data to include only the rows where 'month_lt' is between 1 and i 
+        # and where 'example' column equals 'ret_data'
+        ret_df_filt <- ret_data_df %>%
+                filter(between(month_lt, 1, i) == TRUE)
+        # Extracting 'activeCust' and 'lostCust' columns as vectors to use in the MLL function
+        activeCust <- c(ret_df_filt$activeCust)
+        lostCust <- c(ret_df_filt$lostCust)
+        # Optimizing the alpha and beta parameters by minimizing the MLL function 
+        opt <- optim(c(1, 1), MLL)
+        # Using the optimized parameters to predict retention using the survival function
+        retention_pred <- round(c(1, survivalBG(alpha = opt$par[1], beta = opt$par[2], c(1:7))), 3)
+         
+        # Creating a data frame to store the month, 'ret_data' as example, the number of months used in prediction, 
+        # and the predicted retention
+        df_pred <- data.frame(month_lt = c(0:7),
+                              fact_months = i,
+                              retention_pred = retention_pred)
+        # Storing the data frame in the list
+        ret_data_preds[[i]] <- df_pred
+}
+# Combining all the data frames in the list into a single data frame
+ret_data_preds<- as.data.frame(do.call('rbind', ret_data_preds))
+```
+
+By merging our original dataset with the predicted retention data, we calculate the Mean Absolute Percentage Error (MAPE) for each observation. This is essentially a measure of the accuracy of our predictions, calculated as the absolute difference between the actual and predicted values, expressed as a percentage of the actual values.
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+# Merge the original data frame with the predictions data frame to calculate the MAPE for each observation
+ret_data_df_all <- ret_data_df %>%
+        select(month_lt, retention_rate) %>%
+        left_join(., ret_data_preds, by = c('month_lt')) %>%
+        mutate(MAPE = abs(((retention_rate-retention_pred)/retention_rate))*100)
+
+# (Note: The next block repeats the previous operation, so it's redundant and can be removed)
+
+# Preparing the data frame to include MAPE column, which calculates the mean absolute percentage error 
+# between the predicted and actual retention rates
+ret_data_df_all <- ret_data_df %>%
+        select(month_lt, retention_rate) %>%
+        left_join(., ret_data_preds, by = 'month_lt') %>%
+        mutate(MAPE = abs(((retention_rate - retention_pred) / retention_rate)) * 100)
+
+# Grouping data by 'fact_months' and calculating the average MAPE over each group
+mape_plot_data <- ret_data_df_all %>% 
+  group_by(fact_months) %>% 
+  summarize(MAPE=mean(abs(((retention_rate - retention_pred) / retention_rate))))
+# Creating a bar chart visualization of the average MAPE for each 'fact_months' group
+(mape_plot<-ggplot(data = mape_plot_data, aes(x = factor(fact_months), y = MAPE))+
+        # Drawing the bars with 'steelblue' color
+        geom_bar(stat = 'identity', fill = "steelblue") +
+        # Labeling the axes
+        labs(x = "Fact Months", y = "Mean Average Percentage Error(%)",subtitle = 'High error rate in the first month, but rapid improvement over time')+
+        # Applying a minimal theme to the plot
+        theme_minimal() +
+        # Adding text labels to the bars to display the MAPE values
+        geom_text(aes(label = sprintf("%.3f", MAPE)), vjust = -0.5, color = "black"))
+```
+
+Finally, we visualized these average MAPE values, depicting how the prediction error changes after observing data over time. The visualization also underscores a quick improvement in accuracy after the first month, offering an indication of improved prediction accuracy after every additional month and data collected from it.
+
+It is a positive sign that the MAPE is on a declining trend, as it suggests the model is becoming progressively more reliable in its predictions. Despite the encouraging trend, it is essential to continually monitor and fine-tune the model to maintain or even enhance its predictive accuracy further.
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+# Retention prediction line chart using ggplot
+ggplot(ret_data_df_all, aes(x = month_lt, y = retention_rate)) +
+        # Applying a minimalistic theme to the plot
+        theme_minimal() +
+        # Adding a line geometry to plot the retention rates over the months with a steelblue color and a size of 1.0
+        geom_line(size = 1.0, color = 'steelblue') +
+        # Adding point geometry to plot individual data points for the retention rates with a steelblue color and a size of 1.0
+        geom_point(size = 1.0, color = 'steelblue') +
+        # Adding another line geometry to plot the predicted retention rates, grouped by 'fact_months' 
+        # with a steelblue color, a size of 1.0, and an alpha of 0.5 to make it semi-transparent
+        geom_line(aes(y = retention_pred, group = fact_months), color = 'steelblue', alpha = 0.5) +
+        # Customizing the plot theme with specific attributes for title, axis text, and strip text
+        theme(plot.title = element_text(size = 20, face = 'bold', vjust = 2, hjust = 0.5),
+              axis.text.x = element_text(size = 8, hjust = 0.5, vjust = .5, face = 'plain'),
+              strip.text = element_text(face = 'bold', size = 12)) +
+        # Labeling the x-axis as 'Months'
+        labs(x='Months',y='Retention rate',subtitle = 'Predicted values quite close to the real data') +
+        # Adjusting the x-axis scale to have breaks at rounded numbers spanning the range of 'month_lt' in the data
+        scale_x_continuous(breaks = round(seq(min(ret_data_df_all$month_lt), max(ret_data_df_all$month_lt))))
+```
+
+### Lifetime Value Prediction
+
+Finally, let's imagine that we want to know average CLV of a user in his/her first 7 months. We can utilized the predicted retention rates to estimate the Lifetime Value (LTV) over a period of time, calculating both the monthly and cumulative LTV.
+
+```{r}
+# Defining a subscription price
+p = 10
+# Filtering the data frame to only include the data for the 'ret_data' example and for month_lt between 1 and i (where i is dynamically specified in the loop)
+ret_df_filt <- ret_data_df %>%
+                filter(between(month_lt, 1, i) == TRUE )
+# Assigning the activeCust and lostCust vectors based on the filtered data frame         
+activeCust <- c(ret_df_filt$activeCust)
+lostCust <- c(ret_df_filt$lostCust)
+# Finding the optimal parameters alpha and beta for the shifted beta geometric (sBG) distribution using the optim function and the Maximum Log-Likelihood (MLL) function
+opt <- optim(c(1, 1), MLL)
+# Predicting the retention rates for the 3rd to the 7th month based on the optimal parameters found
+retention_pred <- round(c(survivalBG(alpha = opt$par[1], beta = opt$par[2], c(3:7))), 3)
+# Creating a data frame to store the predicted retention rates along with the corresponding month_lt values
+data_df_pred <- data.frame(month_lt = c(3:7),
+                      retention_pred = retention_pred)
+# Creating a new data frame to calculate the LTV
+data_df_ltv <- ret_data_df %>%
+        # Filtering the data frame to include data for the 'ret_data' example and month_lt between 0 and 2
+        filter(between(month_lt, 0, 2) == TRUE) %>%
+        # Selecting only the month_lt and retention_rate columns
+        select(month_lt, retention_rate) %>%
+        # Adding the predicted data for the months 3 to 7 to the existing data for months 0 to 2
+        bind_rows(., data_df_pred) %>%
+        # Creating new columns: 
+        # - 'retention_rate_calc': combining actual and predicted retention rates
+        # - 'ltv_monthly': calculating the monthly LTV based on the retention rate and a fixed revenue value of 10
+        # - 'ltv_cum': calculating the cumulative LTV over the months
+        mutate(retention_rate_calc = ifelse(is.na(retention_rate), retention_pred, retention_rate),
+               ltv_monthly = retention_rate_calc * 10,
+               ltv_cum = round(cumsum(ltv_monthly), 2))
+```
+
+At the end of 7 months, the cumulative LTV is found to be \$21.43, which suggests that a customer is expected to bring a value of \$21.43 on average over a span of 7 months:
+```{r,echo=FALSE}
+kbl(data_df_ltv) %>% kable_styling(bootstrap_options = c("striped"),row_label_position = c('c'))
 ```
 
 
-```{r, warning=FALSE,message=FALSE,echo=FALSE}
-# New data frame
-days <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-sample_size <- length(days)
 
-# Randomization
-breakfast <- data %>% 
-  filter(type=="breakfast") %>%
-  sample_n(size=sample_size, replace = FALSE) %>%
-  add_column(days)
+### Model evaluation
 
-lunch <- data %>% 
-  filter(type=="lunch") %>%
-  sample_n(size=sample_size, replace = FALSE) %>%
-  add_column(days)
+In the final stage, we utilized the Mean Absolute Percentage Error (MAPE) to gauge the accuracy of our BG model's predictions. To determine the preciseness of the retention rate predictions crafted by our model, we computed the MAPE for the projected values spanning the 4th to 6th month, leveraging the data amassed from the 1st to the 3rd month.
 
-dinner <- data %>% 
-  filter(type=="dinner") %>%
-  sample_n(size=sample_size, replace = FALSE) %>%
-  add_column(days)
+```{r}
+# MAPE of predicted
+MAPE(data_df_ltv$retention_pred[4:8],ret_data[4:8])
 ```
 
-```{r, warning=FALSE,message=FALSE,echo=FALSE}
-# Final weekly meal schedule
-schedule <- rbind.data.frame(breakfast, lunch, dinner)
-result_table <- suppressMessages(schedule %>%
-  group_by(days, type) %>%
-  summarise(meal, prep_time_min, recipe_link, effort) %>%
-  arrange(match(days, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))))
+In our case, the MAPE value is 0.06803042 or 6.803042% This indicates that, on average, our predictions are deviating from the actual values by a margin of approximately 6.8%. A MAPE value below 10% is generally considered to represent a good fit of the model to the data, suggesting that our predictive model is performing fairly well, with a relatively low error rate. This low MAPE score signifies a high level of accuracy in the predictions generated for the retention rates from the 4th to the 7th months.
 
-# Create a nicely formatted table
-styled_table <- result_table %>%
-  kable(format = "html",
-        escape = FALSE,
-        col.names = c("Day", "Type", "Meal", "Prep Time (min)", "Recipe Link", "Effort Level")) %>%
-  kable_styling("striped", full_width = FALSE) %>%
-  column_spec(1, bold = TRUE)  # Apply bold formatting to the first column (days)
+## Conclusion
 
-# Create a nicely formatted table with adjusted column widths
-styled_table <- result_table %>%
-  kable(format = "html",
-        escape = FALSE,
-        align='l',
-        col.names = c("Day", "Type", "Meal", "PrepTime (min)", "Recipe Link", "Effort Level")) %>%
-  kable_styling("striped", full_width = FALSE) %>%
-  column_spec(1, bold = TRUE) %>%  # Apply bold formatting to the first column (days)
-  column_spec(2, width = "70px") %>%  # Adjust the width of the "Type" column
-  column_spec(3, width = "150px") %>%  # Adjust the width of the "Meal" column
-  column_spec(4, width = "200px") %>%  # Adjust the width of the "Prep Time (min)" column
-  column_spec(5, width = "200px") %>%  # Adjust the width of the "Recipe Link" column
-  column_spec(6, width = "100px")     # Adjust the width of the "Effort Level" column
-
-# Print the table with the specified styling
-styled_table
-
-```
-
-
-```{r, echo=FALSE, warning=FALSE,message=FALSE,echo=FALSE}
-# Saving to Google Sheet 
-# Run only once!
-#uppressMessages(sheet_write(data = result_table,
- #           ss = sheet_url,
-  #          sheet = "Calendar Week 35")) # sheet = the week 
-```
-
-## R code
-```{r, results='hide',eval=FALSE}
-# Packages
-library(tidyr)
-library(tidyverse)
-library(googlesheets4)
-library(knitr)
-library(kableExtra)
-gs4_auth(email = "YOUR_GOOGLE_EMAIL") # INSERT YOUR G-MAIL ASSOCIATED WITH YOUR GOOGLE SHEET ACCOUNT
-
-# Manual import
-data <- read.csv("Meal Planner - Calendar Week 35.csv",header=TRUE)
-#or via Google Sheet package
-sheet_url <- "YOUR_GOOGLE_SHEET_URL"
-#data<- suppressMessages(googlesheets4::read_sheet(sheet_url,sheet = 1)) # IMPORTANT: sheet = 1 means it takes first sheet tab.
-data$type <- tolower(data$type) #lower-case the type of the meal
-
-# New data frame with days
-days <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-sample_size <- length(days)
-
-# Randomization per meal type
-breakfast <- data %>% 
-  filter(type=="breakfast") %>%
-  sample_n(size=sample_size, replace = FALSE) %>%
-  add_column(days)
-
-lunch <- data %>% 
-  filter(type=="lunch") %>%
-  sample_n(size=sample_size, replace = FALSE) %>%
-  add_column(days)
-
-dinner <- data %>% 
-  filter(type=="dinner") %>%
-  sample_n(size=sample_size, replace = FALSE) %>%
-  add_column(days)
-
-# Final weekly meal schedule
-schedule <- rbind.data.frame(breakfast, lunch, dinner)
-result_table <- suppressMessages(schedule %>%
-  group_by(days, type) %>%
-  summarise(meal, prep_time_min, recipe_link, effort) %>%
-  arrange(match(days, c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))))
-
-# Create a nicely formatted table with adjusted column widths
-styled_table <- result_table %>%
-  kable(format = "html",
-        escape = FALSE,
-        align='l',
-        col.names = c("Day", "Type", "Meal", "PrepTime (min)", "Recipe Link", "Effort Level")) %>%
-  kable_styling("striped", full_width = FALSE) %>%
-  column_spec(1, bold = TRUE) %>%  # Apply bold formatting to the first column (days)
-  column_spec(2, width = "70px") %>%  # Adjust the width of the "Type" column
-  column_spec(3, width = "150px") %>%  # Adjust the width of the "Meal" column
-  column_spec(4, width = "200px") %>%  # Adjust the width of the "Prep Time (min)" column
-  column_spec(5, width = "200px") %>% # column # Adjust the width of the "Recipe Link" column
-  column_spec(6, width = "100px")     # Adjust the width of the "Effort Level" 
-
-# Print the table with the specified styling
-styled_table
-
-# Saving to the same Google Sheet you used above
-SuppressMessages(sheet_write(data = result_table,
-           ss = sheet_url,
-           sheet = "Calendar Week 35")) # sheet = the week number
-
-```
-
-#### For more projects and information about me, check out [my website](https://mirzamujanovic.github.io/website/).
+We have demonstrated the power of the BG distribution in predicting customer lifetime value, tackling the inherent challenges posed by variable churn rates and changing customer behaviors. Moreover, we not only estimated the customer retention rates but also forecasted the lifetime value, which is a crucial metric for any subscription-based business. The predictive accuracy, as indicated by MAPE, shows that the BG model can be a reliable tool in CLV predictions, providing businesses with a more precise lens to view and strategize their customer retention and revenue generation strategies. Thus, embracing such analytical approaches can pave the way for sustained business growth and customer satisfaction.
