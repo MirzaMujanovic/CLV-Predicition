@@ -2,7 +2,7 @@
 
 In this repository, we unravel the concept of Customer Lifetime Value (CLV) using beta-geometric (BG) distribution to predict it with higher precision in the context of a subscription business. Dive deep into the R examples to learn the application!
 
-Go to the GitHub page and check it out:
+Go to the GitHub page and check it out: https://mirzamujanovic.github.io/CLV-Predicition/
 
 ### **:rocket: Quick Overview**
 
