@@ -79,7 +79,7 @@ library(knitr)
 library(kableExtra)
 ```
 
-A hypothetical firm selected a user cohort, for instance, users of a specific subscription (e.g. monthly subscription) hailing from a specific country, to analyze their monthly subscription retention rates over the recent months and refine its Customer Lifetime Value (CLV) predictions based on recent monthly subscription retention rates. To enhance the precision of our CLV prediction, it is beneficial to formulate more detailed cohorts by incorporating additional attributes of subscribers that can potentially influence churn rates.
+A hypothetical firm selected a user cohort, for instance, users of a specific subscription (e.g. monthly subscription) hailing from a specific country, to analyze their monthly subscription retention rates over the recent months and refine its Customer Lifetime Value (CLV) predictions based on recent monthly subscription retention rates. The price of the monthly subscription is 10 USD. To enhance the precision of our CLV prediction, it is beneficial to formulate more detailed cohorts by incorporating additional attributes of subscribers that can potentially influence churn rates.
 
 The retention rates were recorded as follows:
 
@@ -366,7 +366,7 @@ data_df_ltv <- ret_data_df %>%
                ltv_cum = round(cumsum(ltv_monthly), 2))
 ```
 
-At the end of 7 months, the cumulative LTV is found to be 21.43 USD, which suggests that a customer is expected to bring a value of 21.43 USD on average over a span of 7 months:
+At the end of 7 months, the cumulative LTV for the monthly subscription of 10 USD is found to be 21.43 USD. That suggests that a customer is expected to bring a value of 21.43 USD on average over a span of 7 months:
 
 ```{r,echo=FALSE}
 kbl(data_df_ltv) %>% kable_styling(bootstrap_options = c("striped"),row_label_position = c('c'))
