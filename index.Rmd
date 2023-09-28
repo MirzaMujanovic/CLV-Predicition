@@ -4,11 +4,12 @@ output:
   html_document:
     css: styles.css
 ---
-### TLDR;
 
-In this article, we delve deep into the concept of Customer Lifetime Value (CLV) and how it can be precisely estimated using beta-geometric (BG) distribution to predict a customer's lifetime value with more accuracy. We also illustrate the application using a real example with R programming, showcasing the utility of the BG model in a subscription business setting.
+### 📌 TLDR
 
-### Customer Lifetime Value (CLV or LTV)
+In this article, we have demonstrated the power of the beta-geometric distribution in predicting customer lifetime value, tackling the inherent challenges posed by variable churn rates and changing customer behaviors. Moreover, we not only estimated the customer retention rates but also forecasted the lifetime value, a crucial metric for any subscription-based business. The predictive accuracy, as indicated by MAPE, shows that the BG model can be a reliable tool in CLV predictions, offering businesses a more precise lens to view and strategize their customer retention and revenue generation strategies.
+
+### 📊 Customer Lifetime Value (CLV or LTV)
 
 Customer Lifetime Value (CLV or LTV) is a metric that represents the total net profit a company can expect to earn from a single customer throughout their time as a customer. It is an important metric as it helps businesses understand how much value different customers bring over their lifetime and can guide resource allocation, marketing strategies, and pricing policies. Here are some basic elements often used to calculate LTV
 
@@ -54,11 +55,19 @@ $$CLV = (ARPU \times \text{Gross Margin}) / \text{Churn Rate}$$
 
 By incorporating ARPU and Gross Margin, we essentially derive a metric representing the net revenue per user, which is then divided by the churn rate to get a value representing the lifetime value of a customer.
 
-## Challenges
+## 🚫 Challenges
 
-Predicting CLV is not a straightforward task. The churn rates are not constant; they can vary significantly over time due to a multitude of factors, including changes in customer behavior and preferences. Similarly, user churns are not consistent; some might leave early in their customer journey, while others stick around for a longer period. Moreover, the offerings and revenue generation is seldom constant, undergoing changes due to business strategies, market dynamics, and customer demands.
+Calculating CLV isn't a direct endeavor. The formulas mentioned earlier are based on several simplifying assumptions:
 
-## Shifted-Beta-Geometric Model
+1.  The churn rate is consistent month-to-month.
+
+2.  All customers exhibit similar churn behaviors.
+
+3.  The company's offerings, encompassing both pricing and competitive dynamics, remain uniform.
+
+Nevertheless, the shifted-Beta-Geometric model presents a more sophisticated approach for determining and forecasting CLV.
+
+## 🔬 Shifted-Beta-Geometric Model
 
 ```{r, echo=FALSE,warning=FALSE, error=FALSE,message=FALSE}
 library(ggplot2)
@@ -132,7 +141,7 @@ To accurately forecast customer retention and churn, we're utilizing the proven 
 
 Therefore, we will define a few functions, including churnBG and survivalBG, that are built upon the concepts of beta-geometric distribution to calculate churn and survival probabilities, respectively. The MLL function defines the maximum likelihood estimation which helps in estimating the parameters α and β for our BG model.
 
-### Churn Rate
+### 📉 Churn Rate
 
 ```{r}
 # Define a function to calculate churn using the Shifted Beta Geometric (sBG) distribution
@@ -151,7 +160,7 @@ churnBG <- Vectorize(function(alpha, beta, period) {
 
 The **churnBG** function systematically refines the prediction of the current rate of customer churn by taking a close look at the history of customer behavior, step by step, back to the very beginning. This way, it considers the entire journey and not just recent trends, offering a richer, more detailed picture that can help foresee customer churn with higher precision. It's a smart approach, learning from the past to predict the future, enhancing the reliability of its predictions over time.
 
-### Survival Rate
+### 📈 Survival Rate
 
 ```{r}
 # Define a function to calculate survival using the sBG distribution
@@ -178,7 +187,7 @@ Here's the process:
 
 In essence, it builds a dynamic picture of customer retention, getting more precise with each period, helping us strategize more effectively for the future.
 
-### Maximum Log-Likelihood
+### 🎯 Maximum Log-Likelihood
 
 ```{r}
 # Define a function to calculate the maximum log-likelihood
@@ -208,7 +217,7 @@ The **MLL** function is a crucial tool in refining our understanding of customer
 
 The function computes the Maximum Log-Likelihood, a statistic representing how well the chosen alpha and beta parameters explain the observed customer behavior in our dataset. It uses the churn and survival probabilities - derived from the beta distribution - in its calculations. The beta distribution here is a mathematical function used to model the random behavior of our customer base, with alpha and beta shaping its characteristics to mirror real-world scenarios accurately.
 
-### **Data Transformation**
+### 🔮Retention Predicition
 
 We transformed the data to have additional columns indicating active and lost customers.
 
@@ -228,8 +237,6 @@ ret_data_df <- ret_data_df %>%
 
 kbl(ret_data_df) %>% kable_styling(bootstrap_options = c("striped"),row_label_position = c('c'))
 ```
-
-### Retention Predicition
 
 Now we are using historical data to anticipate customer retention rates over a period of 7 months. After each month, we adjust our predictive parameters to better represent our historical trends, and employ a survival function methodology to forecast the customer retention for every subsequent month.
 
@@ -322,7 +329,7 @@ ggplot(ret_data_df_all, aes(x = month_lt, y = retention_rate)) +
         scale_x_continuous(breaks = round(seq(min(ret_data_df_all$month_lt), max(ret_data_df_all$month_lt))))
 ```
 
-### Lifetime Value Prediction
+### 💰Lifetime Value Prediction
 
 Finally, let's imagine that we want to know average CLV of a user in his/her first 7 months. We can utilized the predicted retention rates to estimate the Lifetime Value (LTV) over a period of time, calculating both the monthly and cumulative LTV.
 
@@ -355,28 +362,47 @@ data_df_ltv <- ret_data_df %>%
         # - 'ltv_monthly': calculating the monthly LTV based on the retention rate and a fixed revenue value of 10
         # - 'ltv_cum': calculating the cumulative LTV over the months
         mutate(retention_rate_calc = ifelse(is.na(retention_rate), retention_pred, retention_rate),
-               ltv_monthly = retention_rate_calc * 10,
+               ltv_monthly = retention_rate_calc * p,
                ltv_cum = round(cumsum(ltv_monthly), 2))
 ```
 
-At the end of 7 months, the cumulative LTV is found to be \$21.43, which suggests that a customer is expected to bring a value of \$21.43 on average over a span of 7 months:
+At the end of 7 months, the cumulative LTV is found to be 21.43 USD, which suggests that a customer is expected to bring a value of 21.43 USD on average over a span of 7 months:
+
 ```{r,echo=FALSE}
 kbl(data_df_ltv) %>% kable_styling(bootstrap_options = c("striped"),row_label_position = c('c'))
 ```
 
+### 🔍 Model evaluation
 
-
-### Model evaluation
-
-In the final stage, we utilized the Mean Absolute Percentage Error (MAPE) to gauge the accuracy of our BG model's predictions. To determine the preciseness of the retention rate predictions crafted by our model, we computed the MAPE for the projected values spanning the 4th to 6th month, leveraging the data amassed from the 1st to the 3rd month.
+In the final stage, we utilized the Mean Absolute Percentage Error (MAPE) to gauge the accuracy of our BG model's predictions. To determine the preciseness of the retention rate predictions crafted by our model, we computed the MAPE for the projected values spanning the 3rd to 7th month, leveraging the data from the 1st and 2nd month.
 
 ```{r}
 # MAPE of predicted
 MAPE(data_df_ltv$retention_pred[4:8],ret_data[4:8])
 ```
 
-In our case, the MAPE value is 0.06803042 or 6.803042% This indicates that, on average, our predictions are deviating from the actual values by a margin of approximately 6.8%. A MAPE value below 10% is generally considered to represent a good fit of the model to the data, suggesting that our predictive model is performing fairly well, with a relatively low error rate. This low MAPE score signifies a high level of accuracy in the predictions generated for the retention rates from the 4th to the 7th months.
+In our case, the MAPE value is 0.06803042 or 6.803042% This indicates that, on average, our predictions are deviating from the actual values by a margin of approximately 6.8%. A MAPE value below 10% is generally considered to represent a good fit of the model to the data, suggesting that our predictive model is performing fairly well, with a relatively low error rate. This low MAPE score signifies a high level of accuracy in the predictions generated for the retention rates from the 3th to the 7th months.
 
-## Conclusion
+### 🌟 Applications and Importance of Predicted Customer Lifetime Value (CLV)
 
-We have demonstrated the power of the BG distribution in predicting customer lifetime value, tackling the inherent challenges posed by variable churn rates and changing customer behaviors. Moreover, we not only estimated the customer retention rates but also forecasted the lifetime value, which is a crucial metric for any subscription-based business. The predictive accuracy, as indicated by MAPE, shows that the BG model can be a reliable tool in CLV predictions, providing businesses with a more precise lens to view and strategize their customer retention and revenue generation strategies. Thus, embracing such analytical approaches can pave the way for sustained business growth and customer satisfaction.
+By understanding the long-term worth of a customer, organizations can make more informed decisions in several areas:
+
+-   **A/B Testing:** With a reliable estimate of CLV, businesses can execute more accurate A/B testing. When understanding the potential long-term revenue from different user segments or product features, they can prioritize tests that may have a significant impact on CLV, leading to more strategic and impactful testing decisions.
+
+-   **User Acquisition Strategy:** Knowing the average CLV allows companies to determine how much they can responsibly spend on acquiring a new customer. For instance, if a customer's predicted CLV is \$100, a business might decide it's feasible to spend up to \$30 or \$40 to acquire that customer, ensuring a positive return on investment.
+
+-   **Resource Allocation:** Predicted CLV can guide businesses on where to allocate resources. Segments with higher CLVs might receive more attention, personalized services, or exclusive offers to ensure their continued loyalty.
+
+-   **Forecasting and Budgeting:** With an understanding of the average CLV, businesses can make more accurate forecasts regarding future revenue. This is especially useful for budgeting and financial planning, ensuring that projections are grounded in data-driven insights.
+
+In essence, a robust prediction of CLV acts as a compass, guiding businesses in making decisions that are not just focused on immediate gains, but on long-term profitability and growth. Embracing such analytical approaches can pave the way for sustained business growth and customer satisfaction.
+
+This revised section should integrate your provided content smoothly into the existing information about the applications of CLV predictions.
+
+### Sources
+
+1.  Fader, Pete & Hardie, Bruce. (2007). [HOW TO PROJECT CUSTOMER RETENTION](https://faculty.wharton.upenn.edu/wp-content/uploads/2012/04/Fader_hardie_jim_07.pdf). Journal of Interactive Marketing.
+
+2.  Bryl', Serhii. (2018). [LTV prediction for a recurring subscription with R](https://www.analyzecore.com/2018/09/19/ltv-prediction-for-a-recurring-subscription-with-r/). AnalyzeCore.
+
+#### **For more projects and information about me, check out [my website.](https://mirzamujanovic.github.io/website/)** 

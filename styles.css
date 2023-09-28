@@ -3,6 +3,7 @@
   /* Customize the font */
   body {
     font-family: "Helvetica Neue", Arial, sans-serif; /* Change to your desired font(s) */
+    text-align: justify;
   }
 
 /* Adjust font size */
